@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VisXamarin.Pages.AddWidgetPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label x:Name="TextStatus" Text="{Binding TextVisible}"
+                   FontSize="28"
+                   VerticalOptions="Center" 
+                   HorizontalOptions="Center"/>
+            <Label x:Name="GaugeStatus" Text="{Binding GaugeVisible}"
+                   FontSize="28"
+                   VerticalOptions="Center" 
+                   HorizontalOptions="Center"/>
+            <Button 
+                  x:Name="AddTextButton"
+                  Text="Add Text" 
+                  Command="{Binding AddText}"
+                  VerticalOptions="Center"/>
+            <Button 
+                  x:Name="AddGaugeButton"
+                  Text="Add Gauge" 
+                  Command="{Binding AddGauge}"
+                  VerticalOptions="Center"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

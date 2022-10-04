@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VisXamarin.Pages.MainPage"
+             xmlns:local="clr-namespace:VisXamarin.PageModels"
+             xmlns:radial="clr-namespace:RadialGauge;assembly=RadialGauge">
+
+    <ContentPage.BindingContext>
+        <local:MainPageModel/>
+    </ContentPage.BindingContext>
+
+    <RefreshView x:Name="myRefreshView" RefreshColor="#2196F3" Refreshing="RefreshView_Refreshing">
+        <ScrollView>
+            <StackLayout x:Name="MyStack">
+
+                <StackLayout x:Name="VisualizeStack">
+                </StackLayout>
+
+                <!--<Label x:Name="Temp" Text="{Binding Temp}"
+                       IsVisible="{Binding TextVisible}"
+                       
+                       FontSize="28"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center"/>
+                <radial:Gauge x:Name="gauge" 
+                              IsVisible="{Binding GaugeVisible}"
+                              CurrentValue="{Binding Temp}"
+                              HorizontalOptions="Center"
+                              WidthRequest="150"
+                              HeightRequest="150"
+                              MinValue="0"
+                              MaxValue="100"
+                              UnitOfMeasurement="°C" 
+                              BottomText="Sensor :)"
+                              HasAnimation="False"
+                              />-->
+                
+                <Button 
+                      Text="GraphQL Query" 
+                      Command="{Binding ClickCommand}"
+                      VerticalOptions="Center"/>
+                <Button 
+                      x:Name="VisibilityToggle"
+                      Text="Visibility" 
+                      Command="{Binding IsTextVisible}"
+                      VerticalOptions="Center"/>
+                <Button
+                      x:Name="AddWidgetButton"
+                      Text="Add Widget" 
+                      Command="{Binding AddWidget}"
+                      VerticalOptions="Center"/>
+                <Button
+                      x:Name="FreeboardButton"
+                      Text="Freeboard Webview" 
+                      Command="{Binding GoToFreeboard}"
+                      VerticalOptions="Center"/>
+
+            </StackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

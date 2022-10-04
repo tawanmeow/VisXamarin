@@ -1,0 +1,26 @@
+{"version": "application/octet-stream","allow_edit": true,"plugins": [],
+        "panes": [
+          {
+            "width": 1,
+            "row": {
+              "3": 1
+            },
+            "col": {
+              "3": 1
+            },
+            "col_width": 1,
+            "widgets": [
+              {
+                "type": "gauge",
+                "settings": {
+                  "min_value": 0,
+                  "max_value": 100
+                }
+              }
+            ]
+          }
+        ],
+        "datasources": [],
+        "columns": 3,
+        "theme": "default"
+      }
