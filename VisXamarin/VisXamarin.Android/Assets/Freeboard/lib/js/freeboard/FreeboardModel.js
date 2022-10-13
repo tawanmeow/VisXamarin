@@ -239,8 +239,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 	this.loadDashboardFromLocalFile = function()
 	{
 		// Check for the various File API support.
-
-		/*let fetchResponse = fetch('http://gqlv2.netpie.io/', {
+		let fetchResponse = fetch('http://gqlv2.netpie.io/', {
 		    method: 'POST',
 		    headers: {
 		        'Accept-Encoding': 'gzip, deflate, br',
@@ -249,24 +248,25 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		        'Connection': 'keep-alive',
 		        'DNT': '1',
 		        'Origin': 'http://gqlv2.netpie.io',
-		        'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ4NzI4NDksIm5iZiI6MTY2NDg3Mjg0OSwiZXhwIjoxNjY0OTU5MjQ5LCJleHBpcmVJbiI6ODY0MDAsImp0aSI6ImtCS3A1RlBHIiwiaXNzIjoiY2VyOnVzZXJ0b2tlbiJ9.XpI-boRj-b5OhSX7xIkZaiQZAY7OedBQEwPOmQvmxmGaBdL0mnj3v21KetjTSat35Fozy4xc8js28bLYrwLMbA'
+		        'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
 		    },
 		    body: JSON.stringify({
 		        'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH18439271") {\n    config\n  }\n}\n'
 		    })
 		});
+
 		fetchResponse.then(res =>
             res.json()).then(d => {
-                console.log(d['data']['freeboardConfig']);
-								loadDashboard(d['data']['freeboardConfig');
-								//self.setEditing(false););
-            })
+								freeboardConfig = d['data']['freeboardConfig']['config']
+								console.log(freeboardConfig);
+								self.loadDashboard(freeboardConfig);
+            });
 
-		console.log("XD");
-		console.log(fetchResponse);*/
+		console.log("Tested")
+		//console.log(fetchResponse);
+	}
 
-
-		if(window.File && window.FileReader && window.FileList && window.Blob)
+		/*if(window.File && window.FileReader && window.FileList && window.Blob)
 		{
 			var input = document.createElement('input');
 			input.type = "file";
@@ -284,7 +284,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 						var textFile = fileReaderEvent.target;
 						var jsonObject = JSON.parse(textFile.result);
-						/*jsonObject = {"version": "application/octet-stream","allow_edit": true,"plugins": [],
+						jsonObject = {"version": "application/octet-stream","allow_edit": true,"plugins": [],
 						        "panes": [
 						          {
 						            "width": 1,
@@ -309,7 +309,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 						        "datasources": [],
 						        "columns": 3,
 						        "theme": "default"
-						      }*/
+						      }
 
 						// IMPORTANT METHOD !!
 						self.loadDashboard(jsonObject);
@@ -326,7 +326,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		{
 			alert('Unable to load a file in this browser.');
 		}
-	}
+	}*/
 
 	this.saveDashboardClicked = function(){
 		var target = $(event.currentTarget);

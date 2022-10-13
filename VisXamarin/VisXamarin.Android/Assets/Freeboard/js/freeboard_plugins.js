@@ -263,7 +263,6 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 	var self = this;
 
 	var SERIALIZATION_VERSION = 1;
-
 	this.version = 0;
 	this.isEditing = ko.observable(false);
 	this.allow_edit = ko.observable(false);
@@ -497,41 +496,28 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 	this.loadDashboardFromLocalFile = function()
 	{
-		// Check for the various File API support.
-		if(window.File && window.FileReader && window.FileList && window.Blob)
-		{
-			var input = document.createElement('input');
-			input.type = "file";
-			$(input).on("change", function(event)
-			{
-				var files = event.target.files;
+		let fetchResponse = fetch('http://gqlv2.netpie.io/', {
+		    method: 'POST',
+		    headers: {
+		        'Accept-Encoding': 'gzip, deflate, br',
+		        'Content-Type': 'application/json',
+		        'Accept': 'application/json',
+		        'Connection': 'keep-alive',
+		        'DNT': '1',
+		        'Origin': 'http://gqlv2.netpie.io',
+		        'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
+		    },
+		    body: JSON.stringify({
+		        'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH18439271") {\n    config\n  }\n}\n'
+		    })
+		});
 
-				if(files && files.length > 0)
-				{
-					var file = files[0];
-					var reader = new FileReader();
-
-					reader.addEventListener("load", function(fileReaderEvent)
-					{
-
-						var textFile = fileReaderEvent.target;
-						var jsonObject = JSON.parse(textFile.result);
-
-
-						self.loadDashboard(jsonObject);
-						self.setEditing(false);
-					});
-
-					reader.readAsText(file);
-				}
-
-			});
-			$(input).trigger("click");
-		}
-		else
-		{
-			alert('Unable to load a file in this browser.');
-		}
+		fetchResponse.then(res =>
+            res.json()).then(d => {
+								freeboardConfig = d['data']['freeboardConfig']['config']
+								console.log(freeboardConfig);
+								self.loadDashboard(freeboardConfig);
+            });
 	}
 
 	this.saveDashboardClicked = function(){
@@ -824,7 +810,7 @@ function FreeboardUI()
 
 		if(newCols === grid.cols)
 		{
-			return false; 
+			return false;
 		}
 		else
 		{
@@ -2843,10 +2829,104 @@ var freeboard = (function()
 	return {
 		initialize          : function(allowEdit, finishedCallback)
 		{
+
 			ko.applyBindings(theFreeboardModel);
+			/*let fetchResponse = fetch('http://gqlv2.netpie.io/', {
+					method: 'POST',
+					headers: {
+							'Accept-Encoding': 'gzip, deflate, br',
+							'Content-Type': 'application/json',
+							'Accept': 'application/json',
+							'Connection': 'keep-alive',
+							'DNT': '1',
+							'Origin': 'http://gqlv2.netpie.io',
+							'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
+					},
+					body: JSON.stringify({
+							'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH18439271") {\n    config\n  }\n}\n'
+					})
+			});
+
+			fetchResponse.then(res =>
+							res.json()).then(d => {
+									freeboardConfig = d['data']['freeboardConfig']['config']
+									console.log(freeboardConfig);
+									theFreeboardModel.loadDashboard(freeboardConfig);
+									theFreeboardModel.setEditing(false);
+							});*/
+			freeboardConfig =	{
+								"version": 1,
+								"allow_edit": true,
+								"plugins": [],
+								"panes": [
+									{
+										"width": 1,
+										"row": {
+											"2": 1,
+											"3": 1
+										},
+										"col": {
+											"2": 1,
+											"3": 1
+										},
+										"col_width": 1,
+										"widgets": [
+											{
+												"type": "text_widget",
+												"settings": {
+													"size": "regular",
+													"value": "datasources[\"mosq\"][\"undefined\"]",
+													"animate": true
+												}
+											}
+										]
+									},
+									{
+										"width": 1,
+										"row": {
+											"2": 5,
+											"3": 5
+										},
+										"col": {
+											"2": 1,
+											"3": 1
+										},
+										"col_width": 1,
+										"widgets": [
+											{
+												"type": "gauge",
+												"settings": {
+													"value": "datasources[\"mosq\"][\"undefined\"]",
+													"min_value": 0,
+													"max_value": 100
+												}
+											}
+										]
+									}
+								],
+								"datasources": [
+									{
+										"name": "mqtt",
+										"type": "mqtt",
+										"settings": {
+											"topic": "/testtopic/cipherflow",
+											"server": "test.mosquitto.org",
+											"port": 8081,
+											"use_encryption": true,
+											"client_id": "cipherflow-12345",
+											"api_key": "",
+											"api_auth_token": "",
+											"json_data": false
+										}
+									}
+								],
+								"columns": 3
+							}
+			theFreeboardModel.loadDashboard(freeboardConfig);
+			theFreeboardModel.setEditing(false);
 
 			// Check to see if we have a query param called load. If so, we should load that dashboard initially
-			var freeboardLocation = getParameterByName("load");
+			/*var freeboardLocation = getParameterByName("load");
 
 			if(freeboardLocation != "")
 			{
@@ -2875,7 +2955,7 @@ var freeboard = (function()
 				}
 
                 freeboard.emit("initialized");
-			}
+			}*/
 		},
 		newDashboard        : function()
 		{
@@ -3596,7 +3676,7 @@ freeboard.loadDatasourcePlugin({
                 // **required** : Set to true if this setting is required for the datasource to be created.
                 "required" : true
 			}
-			
+
 		],
 		// **newInstance(settings, newInstanceCallback, updateCallback)** (required) : A function that will be called when a new instance of this plugin is requested.
 		// * **settings** : A javascript object with the initial settings set by the user. The names of the properties in the object will correspond to the setting names defined above.
@@ -3622,11 +3702,11 @@ freeboard.loadDatasourcePlugin({
 		// Good idea to create a variable to hold on to our settings, because they might change in the future. See below.
 		var currentSettings = settings;
 
-		
+
 
 		/* This is some function where I'll get my data from somewhere */
 
- 	
+
 		function getData()
 		{
 
@@ -3634,11 +3714,11 @@ freeboard.loadDatasourcePlugin({
 		 var conn = skynet.createConnection({
     		"uuid": currentSettings.uuid,
     		"token": currentSettings.token,
-    		"server": currentSettings.server, 
+    		"server": currentSettings.server,
     		"port": currentSettings.port
-  				});	
-			 
-			 conn.on('ready', function(data){	
+  				});
+
+			 conn.on('ready', function(data){
 
 			 	conn.on('message', function(message){
 
@@ -3650,7 +3730,7 @@ freeboard.loadDatasourcePlugin({
 			 });
 			}
 
-	
+
 
 		// **onSettingsChanged(newSettings)** (required) : A public function we must implement that will be called when a user makes a change to the settings.
 		self.onSettingsChanged = function(newSettings)
@@ -3669,7 +3749,7 @@ freeboard.loadDatasourcePlugin({
 		// **onDispose()** (required) : A public function we must implement that will be called when this instance of this plugin is no longer needed. Do anything you need to cleanup after yourself here.
 		self.onDispose = function()
 		{
-		
+
 			//conn.close();
 		}
 
