@@ -508,7 +508,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		        'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
 		    },
 		    body: JSON.stringify({
-		        'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH18439271") {\n    config\n  }\n}\n'
+		        'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH26133016") {\n    config\n  }\n}\n'
 		    })
 		});
 
@@ -518,17 +518,81 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 								console.log(freeboardConfig);
 								self.loadDashboard(freeboardConfig);
             });
+						// Check for the various File API support.
+						/*if(window.File && window.FileReader && window.FileList && window.Blob)
+						{
+							var input = document.createElement('input');
+							input.type = "file";
+							$(input).on("change", function(event)
+							{
+								var files = event.target.files;
+
+								if(files && files.length > 0)
+								{
+									var file = files[0];
+									var reader = new FileReader();
+
+									reader.addEventListener("load", function(fileReaderEvent)
+									{
+
+										var textFile = fileReaderEvent.target;
+										var jsonObject = JSON.parse(textFile.result);
+
+
+										self.loadDashboard(jsonObject);
+										self.setEditing(false);
+									});
+
+									reader.readAsText(file);
+								}
+
+							});
+							$(input).trigger("click");
+						}
+						else
+						{
+							alert('Unable to load a file in this browser.');
+						}*/
+
 	}
 
-	this.saveDashboardClicked = function(){
-		var target = $(event.currentTarget);
-		var siblingsShown = target.data('siblings-shown') || false;
-		if(!siblingsShown){
-			$(event.currentTarget).siblings('label').fadeIn('slow');
-		}else{
-			$(event.currentTarget).siblings('label').fadeOut('slow');
-		}
-		target.data('siblings-shown', !siblingsShown);
+	this.saveDashboardClicked = function()
+	{
+			/*var savedConfig = self.serialize();
+			var key = "datasources";
+			delete savedConfig[key];
+			console.log(savedConfig);*/
+			updateFreeboardConfigCommand = 'mutation updateFreeboardConfig {\n  updateFreeboardConfig (dashboardid:"DASH26133016", config:' + JSON.stringify(JSON.stringify(savedConfig)) + ") {\n    config\n  }\n}\n"
+			let fetchResponse = fetch('http://gqlv2.netpie.io/', {
+			    method: 'POST',
+			    headers: {
+			        'Accept-Encoding': 'gzip, deflate, br',
+			        'Content-Type': 'application/json',
+			        'Accept': 'application/json',
+			        'Connection': 'keep-alive',
+			        'DNT': '1',
+			        'Origin': 'http://gqlv2.netpie.io',
+			        'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
+			    },
+			    body: JSON.stringify({
+			        'query': updateFreeboardConfigCommand
+			    })
+			});
+
+			fetchResponse.then(res =>
+	            res.json()).then(d => {
+									freeboardConfig = d['data']['updateFreeboardConfig']['config']
+									alert("Config saved");
+	            });
+
+			/*var target = $(event.currentTarget);
+			var siblingsShown = target.data('siblings-shown') || false;
+			if(!siblingsShown){
+				$(event.currentTarget).siblings('label').fadeIn('slow');
+			}else{
+				$(event.currentTarget).siblings('label').fadeOut('slow');
+			}
+			target.data('siblings-shown', !siblingsShown);*/
 	}
 
 	this.saveDashboard = function(_thisref, event)
@@ -2831,102 +2895,11 @@ var freeboard = (function()
 		{
 
 			ko.applyBindings(theFreeboardModel);
-			/*let fetchResponse = fetch('http://gqlv2.netpie.io/', {
-					method: 'POST',
-					headers: {
-							'Accept-Encoding': 'gzip, deflate, br',
-							'Content-Type': 'application/json',
-							'Accept': 'application/json',
-							'Connection': 'keep-alive',
-							'DNT': '1',
-							'Origin': 'http://gqlv2.netpie.io',
-							'Authorization': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiNWI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjoxOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A'
-					},
-					body: JSON.stringify({
-							'query': 'query dashboardList {\n  freeboardConfig (dashboardid:"DASH18439271") {\n    config\n  }\n}\n'
-					})
-			});
-
-			fetchResponse.then(res =>
-							res.json()).then(d => {
-									freeboardConfig = d['data']['freeboardConfig']['config']
-									console.log(freeboardConfig);
-									theFreeboardModel.loadDashboard(freeboardConfig);
-									theFreeboardModel.setEditing(false);
-							});*/
-			freeboardConfig =	{
-								"version": 1,
-								"allow_edit": true,
-								"plugins": [],
-								"panes": [
-									{
-										"width": 1,
-										"row": {
-											"2": 1,
-											"3": 1
-										},
-										"col": {
-											"2": 1,
-											"3": 1
-										},
-										"col_width": 1,
-										"widgets": [
-											{
-												"type": "text_widget",
-												"settings": {
-													"size": "regular",
-													"value": "datasources[\"mosq\"][\"undefined\"]",
-													"animate": true
-												}
-											}
-										]
-									},
-									{
-										"width": 1,
-										"row": {
-											"2": 5,
-											"3": 5
-										},
-										"col": {
-											"2": 1,
-											"3": 1
-										},
-										"col_width": 1,
-										"widgets": [
-											{
-												"type": "gauge",
-												"settings": {
-													"value": "datasources[\"mosq\"][\"undefined\"]",
-													"min_value": 0,
-													"max_value": 100
-												}
-											}
-										]
-									}
-								],
-								"datasources": [
-									{
-										"name": "mqtt",
-										"type": "mqtt",
-										"settings": {
-											"topic": "/testtopic/cipherflow",
-											"server": "test.mosquitto.org",
-											"port": 8081,
-											"use_encryption": true,
-											"client_id": "cipherflow-12345",
-											"api_key": "",
-											"api_auth_token": "",
-											"json_data": false
-										}
-									}
-								],
-								"columns": 3
-							}
-			theFreeboardModel.loadDashboard(freeboardConfig);
-			theFreeboardModel.setEditing(false);
+			/*theFreeboardModel.loadDashboard(freeboardConfig);
+			theFreeboardModel.setEditing(false);*/
 
 			// Check to see if we have a query param called load. If so, we should load that dashboard initially
-			/*var freeboardLocation = getParameterByName("load");
+			var freeboardLocation = getParameterByName("load");
 
 			if(freeboardLocation != "")
 			{
@@ -2955,7 +2928,7 @@ var freeboard = (function()
 				}
 
                 freeboard.emit("initialized");
-			}*/
+			}
 		},
 		newDashboard        : function()
 		{

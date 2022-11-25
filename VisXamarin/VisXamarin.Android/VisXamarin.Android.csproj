@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseUrl_Android.cs" />
+    <Compile Include="ClearCookie.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,6 +83,7 @@
     <AndroidAsset Include="Assets\Freeboard\.gitignore" />
     <AndroidAsset Include="Assets\Freeboard\docker-compose.yml" />
     <AndroidAsset Include="Assets\Freeboard\Dockerfile" />
+    <AndroidAsset Include="Assets\Freeboard\index.html" />
     <AndroidAsset Include="Assets\Freeboard\LICENSE" />
     <AndroidAsset Include="Assets\Freeboard\package.json" />
     <AndroidAsset Include="Assets\Freeboard\README.md" />
@@ -136,9 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\Freeboard\Gruntfile.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidAsset Include="Assets\Freeboard\index.html" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\Freeboard\index-dev.html" />
@@ -319,6 +318,18 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\Freeboard\test\casper\util\test_util.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Freeboard\plugins\cyblion\browsermqtt.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Freeboard\plugins\cyblion\cyblion.datasource.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Freeboard\plugins\cyblion\cyblion.decryptor.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Freeboard\plugins\cyblion\cyblion.mqtt.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

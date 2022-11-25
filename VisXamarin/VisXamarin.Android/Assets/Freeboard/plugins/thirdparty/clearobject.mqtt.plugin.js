@@ -162,8 +162,10 @@
       } catch (err) {
         console.log("Could not disconnect client: " + err);
       }
+      console.log("TEST2");
       var client = new Paho.MQTT.Client(currentSettings.server, currentSettings.port, 'a:' + currentSettings.client_id + ':' + currentSettings.api_key + (new Date().getTime()).toString());
       client.connect({
+        console.log("TEST");
         onSuccess: onConnect,
         userName: currentSettings.api_key,
         password: currentSettings.api_auth_token,

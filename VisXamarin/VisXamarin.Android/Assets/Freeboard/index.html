@@ -3,43 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <title>freeboard</title>
+
 	<meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
     <link href="css/freeboard.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/variableTest.js"></script>
     <script src="js/freeboard.thirdparty.min.js"></script>
     <script type="text/javascript">
         head.js("js/freeboard_plugins.min.js",
-        "plugins/thirdparty/clearobject.mqtt.plugin.js",
-        "plugins/thirdparty/paho.mqtt.plugin.js",
-        "plugins/thirdparty/mqttws31.js",
-        "plugins/thirdparty/mqttws31-min.js",
-        "plugins/thirdparty/ibm.iotfoundation.plugin.js",
 
-                // *** Load more plugins here ***
-                function(){
-                    $(function()
-                    { //DOM Ready
-                        freeboard.initialize(true);
+        "plugins/cyblion/browsermqtt.js",
+        "plugins/cyblion/cyblion.mqtt.js",
+        "plugins/cyblion/cyblion.datasource.js",
+        "plugins/cyblion/cyblion.decryptor.js",
 
-                        var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
-                        if (hashpattern !== null) {
-                            $.getJSON(hashpattern[2], function(data) {
-                                freeboard.loadDashboard(data, function() {
-                                    freeboard.setEditing(false);
-                                });
-                            });
-                        }
+        // *** Load more plugins here ***
+        function(){
+            $(function()
+            { //DOM Ready
+                freeboard.setAssetRoot("/freeboard-ui/");
+                freeboard.initialize(true);
 
-                    });
+                let JWTtoken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiN' +
+                'WI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjo' +
+                'xOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4' +
+                'EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A';
+
+                loadDashboard(JWTtoken);
+            });
+        });
+
+        function loadDashboard(JWTtoken){
+          try {
+            let projectid;
+            queryProjectid(JWTtoken).then((data) => {
+              projectid = data['data']['device']['projectid'];
+              queryFreeboardList(JWTtoken, projectid).then((data) => {
+                dashboardid = data['data']['freeboardList'][0]['dashboardid'];
+                loadFromLocalStorage(JWTtoken, dashboardid);
+              });
+            });
+          }
+          catch(err){
+            console.log(err);
+            document.getElementById("error-text").hidden = false;
+            document.getElementById("error-text").innerHTML = "Error. Cannot query dashboard's config, Please contact service provider";
+          }
+
+        }
+
+        function queryProjectid(JWTtoken){
+          try {
+            var projectid;
+            let credential = getCredentialFromURL();
+            let netpieGqlUrl = 'https://gqlv2.netpie.io';
+            let projectListCommand = 'query device {device (deviceid:"' + (credential.deviceid).toString() + '") {projectid}}';
+            return fetch(netpieGqlUrl, {
+                  method: 'POST',
+                  headers: {
+                      'Accept-Encoding': 'gzip, deflate, br',
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                      'Connection': 'keep-alive',
+                      'DNT': '1',
+                      'Origin': netpieGqlUrl,
+                      'Authorization': JWTtoken
+                  },
+                  body: JSON.stringify({
+                      'query': projectListCommand
+                  })
+              }).then((response) => {
+                  return response.json().then((data) => {
+                    return data;
+                }).catch((err) => {
+                  console.log(err);
+                })
+              });
+          }
+          catch(err){
+            console.log(err);
+            document.getElementById("error-text").hidden = false;
+            document.getElementById("error-text").innerHTML = "Error. Cannot query dashboard's config, Please contact service provider";
+          }
+        }
+
+        function queryFreeboardList(JWTtoken, projectid){
+          try {
+              var projectid;
+              let credential = getCredentialFromURL();
+              let netpieGqlUrl = 'https://gqlv2.netpie.io';
+              let dashboardListCommand = 'query freeboardList { freeboardList (filter:{projectid:"' + projectid +'"}) {dashboardid}}';
+              return fetch(netpieGqlUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Connection': 'keep-alive',
+                        'DNT': '1',
+                        'Origin': netpieGqlUrl,
+                        'Authorization': JWTtoken
+                    },
+                    body: JSON.stringify({
+                        'query': dashboardListCommand
+                    })
+                }).then((response) => {
+                    return response.json().then((data) => {
+                      return data;
+                  }).catch((err) => {
+                    console.log(err);
+                  })
                 });
+          }
+          catch(err){
+            console.log(err);
+          }
+        }
+
+        function getCredentialFromURL() {
+            if (location.hash) {
+                let a = location.hash.substring(1).split(':');
+                if (a[0] && a[1]) {
+                    return {
+                        deviceid: a[0],
+                        devicetoken: a[1],
+                    }
+                }
+            }
+            else return null;
+        }
+
+        function injectDatasource(freeboardconfig) {
+
+            let cred = getCredentialFromURL();
+            let newdatasource = [];
+            if (cred && cred.deviceid && cred.devicetoken && freeboardconfig) {
+                for (let i in freeboardconfig.datasources) {
+                    let ds = freeboardconfig.datasources[i];
+                    if (ds.name != 'dashboard') {
+                        newdatasource.push(ds);
+                    }
+                }
+                newdatasource.push({
+                    name: 'dashboard',
+                    settings: {
+                        name: 'dashboard' ,
+                        deviceid: cred.deviceid,
+                        devicetoken: cred.devicetoken
+                    },
+                    type: 'cyblion_datasource'
+                });
+                freeboardconfig.datasources = newdatasource;
+            }
+        }
+
+        function loadFromLocalStorage(JWTtoken, dashboardid) {
+            let freeboardconfig;
+            let netpieGqlUrl = 'https://gqlv2.netpie.io';
+            //let freeboardconfigtext = window.localStorage.getItem("freeboardconfig");
+
+            let dashboardListCommand = 'query freeboardConfig {freeboardConfig (dashboardid:"'+ dashboardid +'") {config}}';
+            let fetchResponse = fetch(netpieGqlUrl, {
+      					method: 'POST',
+      					headers: {
+      							'Accept-Encoding': 'gzip, deflate, br',
+      							'Content-Type': 'application/json',
+      							'Accept': 'application/json',
+      							'Connection': 'keep-alive',
+      							'DNT': '1',
+      							'Origin': netpieGqlUrl,
+      							'Authorization': JWTtoken
+      					},
+      					body: JSON.stringify({
+      							'query': dashboardListCommand
+      					})
+      			});
+
+      			fetchResponse.then(res =>
+      							res.json()).then(d => {
+      									freeboardconfigtext = d['data']['freeboardConfig']['config']
+                        if (freeboardconfigtext) {
+                            //freeboardconfig = JSON.parse(freeboardconfigtext);
+                            freeboardconfig = freeboardconfigtext;
+                        }
+                        else {
+                            freeboardconfig = {
+                                "version": 1,
+                                "allow_edit": true,
+                                "plugins": [],
+                                "panes": [],
+                                "datasources": [],
+                                "columns": 3
+                            }
+
+                        }
+                        injectDatasource(freeboardconfig);
+                        freeboard.loadDashboard(freeboardconfig, function() {
+
+                        });
+      							});
+        }
+
+
+        function saveToLocalStorage() {
+            let freeboardconfigtext = freeboard.serialize();
+            let freeboardconfig = JSON.stringify(freeboardconfigtext);
+            window.localStorage.setItem("freeboardconfig", freeboardconfig);
+        }
+
+        function loadFromFile() {
+            let cred = getCredentialFromURL();
+            freeboard.loadFromFile(cred);
+        }
     </script>
 </head>
 <body>
 <div id="board-content">
     <img id="dash-logo" data-bind="attr:{src: header_image}, visible:header_image()">
     <div class="gridster responsive-column-width">
+        <div id="error-text" hidden="false">.</div>
         <ul data-bind="grid: true">
         </ul>
     </div>
@@ -48,10 +232,10 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <!--<h1 id="board-logo" class="title bordered">freeboard</h1>-->
+                <h1 id="board-logo" class="title bordered">Cyblion [TEST]</h1>
                 <div id="board-actions">
                     <ul class="board-toolbar vertical">
-                        <li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>
+                        <!--<li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>-->
                         <li><i class="icon-download-alt icon-white"></i>
                             <label data-bind="click: saveDashboardClicked">Save Freeboard</label>
                             <label style="display: none;" data-bind="click: saveDashboard" data-pretty="true">[Pretty]</label>
