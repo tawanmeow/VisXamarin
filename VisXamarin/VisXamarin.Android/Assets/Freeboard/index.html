@@ -9,6 +9,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
     <link href="css/freeboard.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700&display=swap" rel="stylesheet">
     <script type="text/javascript" src="js/variableTest.js"></script>
     <script src="js/freeboard.thirdparty.min.js"></script>
     <script type="text/javascript">
@@ -26,22 +29,24 @@
                 freeboard.setAssetRoot("/freeboard-ui/");
                 freeboard.initialize(true);
 
-                let JWTtoken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiN' +
+                /*let JWTtokenz = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdHgiOnsidXNlcmlkIjoiVTkzODc4ODI5NDUyMiIsImNsaWVudGlkIjoiN' +
                 'WI0NGM0ZDRkMWMwODY5ZmE0YjNlZDkyZTFmNzgzYjgifSwic2NvcGUiOltdLCJpYXQiOjE2NjQ3ODQxNzYsIm5iZiI6MTY2NDc4NDE3NiwiZXhwIjo' +
                 'xOTgwNDAzNTQ4LCJleHBpcmVJbiI6MzE1NjE5MzcyLCJqdGkiOiJpZ21rMUVpRSIsImlzcyI6ImNlcjp1c2VydG9rZW4ifQ.wNf8zR-wYqGOW5IRs4' +
                 'EG7MzrukVer-HxSHHaXmW13LwGgA3YAxKq9uCMnhEhSjyptVgHFPjI9vTEhne15oG--A';
 
-                loadDashboard(JWTtoken);
+                loadDashboard(JWTtokenz);*/
             });
         });
 
         function loadDashboard(JWTtoken){
           try {
             let projectid;
+            document.getElementById("jwt").innerHTML = JWTtoken;
             queryProjectid(JWTtoken).then((data) => {
               projectid = data['data']['device']['projectid'];
               queryFreeboardList(JWTtoken, projectid).then((data) => {
                 dashboardid = data['data']['freeboardList'][0]['dashboardid'];
+                document.getElementById("freeboardid").innerHTML = dashboardid;
                 loadFromLocalStorage(JWTtoken, dashboardid);
               });
             });
@@ -217,6 +222,7 @@
             let cred = getCredentialFromURL();
             freeboard.loadFromFile(cred);
         }
+
     </script>
 </head>
 <body>
@@ -232,21 +238,21 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <h1 id="board-logo" class="title bordered">Cyblion [TEST]</h1>
+                <h1 id="board-logo">CYBLION</h1>
                 <div id="board-actions">
                     <ul class="board-toolbar vertical">
                         <!--<li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>-->
                         <li><i class="icon-download-alt icon-white"></i>
                             <label data-bind="click: saveDashboardClicked">Save Freeboard</label>
-                            <label style="display: none;" data-bind="click: saveDashboard" data-pretty="true">[Pretty]</label>
-                            <label style="display: none;" data-bind="click: saveDashboard" data-pretty="false">[Minified]</label>
+                            <div id="jwt" hidden></div>
+                            <div id="freeboardid" hidden></div>
                         </li>
                         <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
                     </ul>
                 </div>
             </div>
             <div id="datasources">
-                <h2 class="title">DATASOURCES</h2>
+                <h2 class="title" style="font-family: 'Red Hat Display', sans-serif;">DATASOURCES</h2>
 
                 <div class="datasource-list-container">
                     <table class="table table-condensed sub-table" id="datasources-list" data-bind="if: datasources().length">
@@ -260,21 +266,22 @@
                         <tbody data-bind="foreach: datasources">
                         <tr>
                             <td>
-                                <span class="text-button datasource-name" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span>
+                                <!--<span class="text-button datasource-name" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span>-->
+                                <span class="text datasource-name" data-bind="text: name"></span>
                             </td>
                             <td data-bind="text: last_updated"></td>
                             <td>
-                                <ul class="board-toolbar">
+                                <!--<ul class="board-toolbar">
                                     <li data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></li>
                                     <li data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}">
                                         <i class="icon-trash icon-white"></i></li>
-                                </ul>
+                                </ul>-->
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                <span class="text-button table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">ADD</span>
+                <!--<span class="text-button table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">ADD</span>-->
             </div>
         </div>
     </div>
@@ -290,7 +297,7 @@
 	</div>
     <div id="toggle-header" data-bind="click: toggleEditing">
         <!--<i id="toggle-header-icon" class="icon-wrench icon-white"></i>-->
-        <span class="text-button table-operation">EDIT</span></div>
+        <span class="text-button table-operation" style="color: #07aaea";>EDIT</span></div>
 </header>
 
 <div style="display:hidden">
